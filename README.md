@@ -73,18 +73,18 @@ git clone https://github.com/your-github-username/my-repo.git
 cd my-repo
 ```
 
-3. Place the `config.json` file and the `update_my_files.sh` script in the root of the cloned repository.
+3. Place the `config.json` file and the `temp_cf.sh` script in the root of the cloned repository.
 
-4. Ensure that the `update_my_files.sh` script is executable:
+4. Ensure that the `temp_cf.sh` script is executable:
 
 ```bash
-chmod +x update_my_files.sh
+chmod +x temp_cf.sh
 ```
 
 5. Run the script:
 
 ```bash
-./update_my_files.sh
+./temp_cf.sh
 ```
 
 The script will check for updates in the template files, merge the changes into the corresponding local files, and create a pull request in the local repository if updates were detected.
