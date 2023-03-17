@@ -89,6 +89,30 @@ chmod +x update_my_files.sh
 
 The script will check for updates in the template files, merge the changes into the corresponding local files, and create a pull request in the local repository if updates were detected.
 
+### Usage With GitHub Action
+
+```yaml
+name: Template Update
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Run daily at midnight
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  check_template_updates:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v2
+
+    - name: Execute Template Update Action
+      uses: your-github-username/template-update-action@main
+      with:
+        config-file: 'config.json'
+```
+
 ## Testing
 
 A test scenario is provided in the [Product Requirements Document](PRD.md) to verify the script's functionality. Follow the steps in the scenario to ensure that the script correctly updates the local files based on the template files and creates pull requests.
