@@ -1,65 +1,98 @@
 # tmpl-cf
 
-Title: Template Update Notification and Merge Script
+This Shell script automates the process of checking for updates in template files from multiple remote repositories and merging the changes into corresponding files in a local repository. The script also creates a pull request in the local repository whenever there are updates to the template files.
 
-## Introduction
+## Table of Contents
 
-This document describes the product requirements for a Shell script that automates the process of checking for updates in template files from multiple remote repositories and merging the changes into corresponding files in a local repository. The script also creates a pull request in the local repository whenever there are updates to the template files.
+- [Features](#features)
+- [Requirements](#requirements)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [Testing](#testing)
+- [License](#license)
 
-## Problem Statement
+## Features
 
-It is challenging for users to keep track of updates in template files located in remote repositories and manually merge the changes into their local files. The proposed script aims to simplify this process by automating the update check, merging the changes, and creating a pull request for the updated files.
+- Supports multiple template repositories
+- Supports multiple template files in each repository
+- Supports multiple local files corresponding to the template files
+- Automatically checks for updates in the template files
+- Merges the changes into the local files when updates are detected
+- Creates a pull request in the local repository for the updated files
 
 ## Requirements
-### Functional Requirements
 
-- Use Shell Script
-- Support multiple template repositories
-- Support multiple template files in each repository
-- Support multiple local files corresponding to the template files
-- Automatically check for updates in the template files
-- Merge the changes into the local files when updates are detected
-- Create a pull request in the local repository for the updated files
-- Maintain a configuration file (config.json) to store the necessary information for the script execution
-
-### Non-Functional Requirements
-
-- The script should be easy to set up and configure
-- The script should be efficient in checking for updates and creating pull requests
-- The script should be able to handle errors and edge cases gracefully
-- The script should be well-documented and maintainable
+- Git
+- Bash
+- [jq](https://stedolan.github.io/jq/) command-line JSON processor
+- A GitHub account with appropriate access to the repositories
 
 ## Configuration
 
-The script will use a configuration file (config.json) that stores the following information:
+The script requires a `config.json` file that stores the necessary information for the script execution:
 
-- GitHub username
-- Personal access token for authentication
-- Local repository name
-- File mappings (template repositories, template files, local files, and last applied commit hashes)
-- Branch name for the created pull request
-- Commit message for the updated files
-- Title and body of the pull request
+```json
+{
+  "github_username": "your-github-username",
+  "access_token": "your-personal-access-token",
+  "my_repo_name": "my-repo",
+  "file_mappings": [
+    {
+      "template_repo_name": "template-repo-1",
+      "template_file_path": "path/to/template-file-1",
+      "my_file_path": "path/to/my-file-1",
+      "last_applied_commit": "commit-hash-1"
+    },
+    {
+      "template_repo_name": "template-repo-2",
+      "template_file_path": "path/to/template-file-2",
+      "my_file_path": "path/to/my-file-2",
+      "last_applied_commit": "commit-hash-2"
+    }
+  ],
+  "my_branch_name": "update-my-files",
+  "my_commit_message": "Update my files with latest template changes",
+  "pr_title": "Update my files with latest template changes",
+  "pr_body": "This PR updates my files with the latest changes made in the templates."
+}
+```
 
-## Implementation
+Replace the placeholders in the `config.json` file with the appropriate information for your GitHub repositories and personal access token. The personal access token should have the necessary permissions to perform the required actions, such as creating a pull request.
 
-The script will be implemented using Shell script, with the following key steps:
+## Usage
 
-- Load configuration from config.json
-- Clone and pull updates from the template repositories
-- Create a new branch in the local repository
-- Iterate through the file mappings and perform the following tasks for each mapping:
-    - Check if there are updates in the template file
-    - Merge the changes into the corresponding local file if updates are detected
-    - Update the last applied commit hash in config.json
-- Create a pull request in the local repository if updates were detected and merged
-- Remove the cloned template repositories
-- Testing
+1. Clone your local repository:
 
-A test scenario will be provided that verifies the script's functionality by creating template repositories and local repositories with corresponding files, running the script, and ensuring the updates are merged and pull requests are created.
+```bash
+git clone https://github.com/your-github-username/my-repo.git
+```
 
-## Future Enhancements
+2. Change the current directory to the cloned repository:
 
-- Provide support for different file formats and merge strategies
-- Implement a notification system to alert users when updates are detected
-- Add support for other version control platforms, such as GitLab and Bitbucket
+```bash
+cd my-repo
+```
+
+3. Place the `config.json` file and the `update_my_files.sh` script in the root of the cloned repository.
+
+4. Ensure that the `update_my_files.sh` script is executable:
+
+```bash
+chmod +x update_my_files.sh
+```
+
+5. Run the script:
+
+```bash
+./update_my_files.sh
+```
+
+The script will check for updates in the template files, merge the changes into the corresponding local files, and create a pull request in the local repository if updates were detected.
+
+## Testing
+
+A test scenario is provided in the [Product Requirements Document](PRD.md) to verify the script's functionality. Follow the steps in the scenario to ensure that the script correctly updates the local files based on the template files and creates pull requests.
+
+## License
+
+This project is released under the [MIT License](LICENSE).
