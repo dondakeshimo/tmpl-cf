@@ -1,0 +1,22 @@
+{
+  "github_username": "your-github-username",
+  "template_repo_name": "template-repo",
+  "my_repo_name": "my-repo",
+  "access_token": "your-personal-access-token",
+  "file_paths": [
+    {
+      "template_file_path": "path/to/template-file-1",
+      "my_file_path": "path/to/my-file-1",
+      "last_applied_commit": "commit-hash-1"
+    },
+    {
+      "template_file_path": "path/to/template-file-2",
+      "my_file_path": "path/to/my-file-2",
+      "last_applied_commit": "commit-hash-2"
+    }
+  ],
+  "my_branch_name": "update-my-files",
+  "my_commit_message": "Update my files with latest template changes",
+  "pr_title": "Update my files with latest template changes",
+  "pr_body": "This PR updates my files with the latest changes made in the templates."
+}
