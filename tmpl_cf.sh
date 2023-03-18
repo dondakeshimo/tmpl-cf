@@ -51,7 +51,7 @@ for file_path in $file_paths; do
 
     # Get commit messages of the template file
     cd "$template_repo_dir"
-    commit_messages=$(git log --pretty=format:"%h - %s" -- "$template_file_path")
+    commit_messages=$(git log --pretty=format:"%h - %s" $last_applied_commit.. -- "$template_file_path")
     cd ..
 
     # Update the PR body with commit messages
@@ -84,6 +84,7 @@ if [ $create_pr -eq 1 ]; then
 
   # Create a PR using curl
   # TODO: should changable about base branch
+  echo $pr_body
   curl -X POST -H "Authorization: token $access_token" -d "{\"title\":\"$pr_title\", \"head\":\"$follower_branch_name\", \"base\":\"main\", \"body\":\"$pr_body\"}" "https://api.github.com/repos/$follower_org/$follower_repo_name/pulls"
 else
   echo "No updates found in the template file."
