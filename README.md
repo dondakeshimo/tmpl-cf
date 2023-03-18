@@ -1,5 +1,7 @@
 # tmpl-cf
 
+_TeMPLate Continuous Following_
+
 This Shell script automates the process of checking for updates in template files from multiple remote repositories and merging the changes into corresponding follower files in a local repository. The script also creates a pull request in the local repository whenever there are updates to the template files.
 
 ## Table of Contents
