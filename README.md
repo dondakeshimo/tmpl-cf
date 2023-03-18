@@ -96,6 +96,8 @@ The script will check for updates in the template files, merge the changes into 
 
 ### Usage With GitHub Action
 
+Ensure that `Settings > Actions > General > Allow GitHub Actions to create and approve pull requests` is enabled.
+
 ```yaml
 name: Template Update
 
@@ -107,6 +109,10 @@ on:
 jobs:
   check_template_updates:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
 
     steps:
     - name: Check out repository
