@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -e
 
 # Load configuration
 config="$(cat $CONFIG_FILE_PATH)"
