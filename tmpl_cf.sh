@@ -2,9 +2,7 @@
 
 # Load configuration
 config="$(cat config.json)"
-template_org=$(echo "$config" | jq -r '.template_org')
 follower_org=$(echo "$config" | jq -r '.follower_org')
-template_repo_name=$(echo "$config" | jq -r '.template_repo_name')
 follower_repo_name=$(echo "$config" | jq -r '.follower_repo_name')
 access_token=$(echo "$config" | jq -r '.access_token')
 file_paths=$(echo "$config" | jq -c '.file_paths[]')
@@ -13,27 +11,22 @@ follower_commit_message=$(echo "$config" | jq -r '.follower_commit_message')
 pr_title=$(echo "$config" | jq -r '.pr_title')
 pr_body=$(echo "$config" | jq -r '.pr_body')
 
-template_repo_url="https://github.com/$template_org/$template_repo_name.git"
-template_repo_dir="template-repo"
-
-# Clone the template repository
-git clone "$template_repo_url" "$template_repo_dir"
-
-# Fetch the latest changes
-cd "$template_repo_dir"
-git pull origin master
-cd ..
-
 # Create a new branch
+# TODO: If the blanch exists in a remote repository, you should checkout the one.
 git checkout -b "$follower_branch_name"
 
 # Initialize a flag for PR creation
 create_pr=0
 
 for file_path in $file_paths; do
+  template_repo_url=$(echo "$file_path" | jq -r '.template_repo_url')
   template_file_path=$(echo "$file_path" | jq -r '.template_file_path')
   follower_file_path=$(echo "$file_path" | jq -r '.follower_file_path')
   last_applied_commit=$(echo "$file_path" | jq -r '.last_applied_commit')
+  template_repo_dir="template-repo"
+
+  # Clone the template repository
+  git clone "$template_repo_url" "$template_repo_dir"
 
   # Get the latest commit hash of the template file
   cd "$template_repo_dir"
@@ -64,10 +57,10 @@ for file_path in $file_paths; do
     # Update the last applied commit hash in config.json
     config=$(echo "$config" | jq ".file_paths |= map(if .template_file_path == \"$template_file_path\" and .follower_file_path == \"$follower_file_path\" then .last_applied_commit = \"$template_file_latest_commit\" else . end)")
   fi
-done
 
-# Remove the cloned template repository
-rm -rf "$template_repo_dir"
+  # Remove the cloned template repository
+  rm -rf "$template_repo_dir"
+done
 
 if [ $create_pr -eq 1 ]; then
   # Commit the changes and push the branch to your repository
@@ -81,5 +74,4 @@ if [ $create_pr -eq 1 ]; then
   git checkout master
 else
   echo "No updates found in the template file."
-  rm -rf "$template_repo_dir"
 fi
