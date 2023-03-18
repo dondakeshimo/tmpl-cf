@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eux
+set -eu
 
 # Load configuration
 config="$(cat $CONFIG_FILE_PATH)"
@@ -47,7 +47,7 @@ for file_path in $file_paths; do
   # Check if the template has updates
   if [ "$template_file_latest_commit" != "$last_applied_commit" ]; then
     # Create a diff file between the template and your file
-    diff -u "$follower_file_path" "$template_repo_dir/$template_file_path" > "diff_${follower_file_path}.patch"
+    diff -u "$follower_file_path" "$template_repo_dir/$template_file_path" > "diff_${follower_file_path}.patch" || true
 
     # Get commit messages of the template file
     cd "$template_repo_dir"
