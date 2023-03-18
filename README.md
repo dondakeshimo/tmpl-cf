@@ -35,23 +35,23 @@ The script requires a `config.json` file that stores the necessary information f
 {
   "github_username": "your-github-username",
   "access_token": "your-personal-access-token",
-  "my_repo_name": "my-repo",
+  "follower_repo_name": "my-repo",
   "file_mappings": [
     {
       "template_repo_name": "template-repo-1",
       "template_file_path": "path/to/template-file-1",
-      "my_file_path": "path/to/my-file-1",
+      "follower_file_path": "path/to/my-file-1",
       "last_applied_commit": "commit-hash-1"
     },
     {
       "template_repo_name": "template-repo-2",
       "template_file_path": "path/to/template-file-2",
-      "my_file_path": "path/to/my-file-2",
+      "follower_file_path": "path/to/my-file-2",
       "last_applied_commit": "commit-hash-2"
     }
   ],
-  "my_branch_name": "update-my-files",
-  "my_commit_message": "Update my files with latest template changes",
+  "follower_branch_name": "update-my-files",
+  "follower_commit_message": "Update my files with latest template changes",
   "pr_title": "Update my files with latest template changes",
   "pr_body": "This PR updates my files with the latest changes made in the templates."
 }

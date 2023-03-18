@@ -4,11 +4,11 @@
 config="$(cat config.json)"
 github_username=$(echo "$config" | jq -r '.github_username')
 template_repo_name=$(echo "$config" | jq -r '.template_repo_name')
-my_repo_name=$(echo "$config" | jq -r '.my_repo_name')
+follower_repo_name=$(echo "$config" | jq -r '.follower_repo_name')
 access_token=$(echo "$config" | jq -r '.access_token')
 file_paths=$(echo "$config" | jq -c '.file_paths[]')
-my_branch_name=$(echo "$config" | jq -r '.my_branch_name')
-my_commit_message=$(echo "$config" | jq -r '.my_commit_message')
+follower_branch_name=$(echo "$config" | jq -r '.follower_branch_name')
+follower_commit_message=$(echo "$config" | jq -r '.follower_commit_message')
 pr_title=$(echo "$config" | jq -r '.pr_title')
 pr_body=$(echo "$config" | jq -r '.pr_body')
 
@@ -24,14 +24,14 @@ git pull origin master
 cd ..
 
 # Create a new branch
-git checkout -b "$my_branch_name"
+git checkout -b "$follower_branch_name"
 
 # Initialize a flag for PR creation
 create_pr=0
 
 for file_path in $file_paths; do
   template_file_path=$(echo "$file_path" | jq -r '.template_file_path')
-  my_file_path=$(echo "$file_path" | jq -r '.my_file_path')
+  follower_file_path=$(echo "$file_path" | jq -r '.follower_file_path')
   last_applied_commit=$(echo "$file_path" | jq -r '.last_applied_commit')
 
   # Get the latest commit hash of the template file
@@ -42,7 +42,7 @@ for file_path in $file_paths; do
   # Check if the template has updates
   if [ "$template_file_latest_commit" != "$last_applied_commit" ]; then
     # Create a diff file between the template and your file
-    diff -u "$my_file_path" "$template_repo_dir/$template_file_path" > "diff_${my_file_path}.patch"
+    diff -u "$follower_file_path" "$template_repo_dir/$template_file_path" > "diff_${follower_file_path}.patch"
 
     # Get commit messages of the template file
     cd "$template_repo_dir"
@@ -53,15 +53,15 @@ for file_path in $file_paths; do
     pr_body="$pr_body\n\nCommit messages for $template_file_path:\n$commit_messages"
 
     # Apply the diff file, add the changes, and remove the diff file
-    git apply "diff_${my_file_path}.patch"
-    git add "$my_file_path"
-    rm "diff_${my_file_path}.patch"
+    git apply "diff_${follower_file_path}.patch"
+    git add "$follower_file_path"
+    rm "diff_${follower_file_path}.patch"
 
     # Set the flag to create PR
     create_pr=1
 
     # Update the last applied commit hash in config.json
-    config=$(echo "$config" | jq ".file_paths |= map(if .template_file_path == \"$template_file_path\" and .my_file_path == \"$my_file_path\" then .last_applied_commit = \"$template_file_latest_commit\" else . end)")
+    config=$(echo "$config" | jq ".file_paths |= map(if .template_file_path == \"$template_file_path\" and .follower_file_path == \"$follower_file_path\" then .last_applied_commit = \"$template_file_latest_commit\" else . end)")
   fi
 done
 
@@ -70,11 +70,11 @@ rm -rf "$template_repo_dir"
 
 if [ $create_pr -eq 1 ]; then
   # Commit the changes and push the branch to your repository
-  git commit -m "$my_commit_message"
-  git push origin "$my_branch_name"
+  git commit -m "$follower_commit_message"
+  git push origin "$follower_branch_name"
 
   # Create a PR using curl
-  curl -X POST -H "Authorization: token $access_token" -d "{\"title\":\"$pr_title\", \"head\":\"$my_branch_name\", \"base\":\"master\", \"body\":\"$pr_body\"}" "https://api.github.com/repos/$github_username/$my_repo_name/pulls"
+  curl -X POST -H "Authorization: token $access_token" -d "{\"title\":\"$pr_title\", \"head\":\"$follower_branch_name\", \"base\":\"master\", \"body\":\"$pr_body\"}" "https://api.github.com/repos/$github_username/$follower_repo_name/pulls"
 
   # Go back to the master branch
   git checkout master
