@@ -14,7 +14,6 @@ access_token="${ACCESS_TOKEN}"
 
 # Add an exception for the GitHub Actions workspace
 git config --global --add safe.directory /github/workspace
-echo "machine github.com login $access_token" > ~/.netrc
 
 # Configure Git user information
 git config --global user.email "tmpl-cf@dondakeshimo.com"
@@ -29,6 +28,7 @@ create_pr=0
 
 for file_path in $file_paths; do
   template_repo_url=$(echo "$file_path" | jq -r '.template_repo_url')
+  template_repo_url="https://x-access-token:$access_token@${template_repo_url#https://}"
   template_file_path=$(echo "$file_path" | jq -r '.template_file_path')
   follower_file_path=$(echo "$file_path" | jq -r '.follower_file_path')
   last_applied_commit=$(echo "$file_path" | jq -r '.last_applied_commit')
@@ -77,10 +77,8 @@ if [ $create_pr -eq 1 ]; then
   git push origin "$follower_branch_name"
 
   # Create a PR using curl
-  curl -X POST -H "Authorization: token $access_token" -d "{\"title\":\"$pr_title\", \"head\":\"$follower_branch_name\", \"base\":\"master\", \"body\":\"$pr_body\"}" "https://api.github.com/repos/$follower_org/$follower_repo_name/pulls"
-
-  # Go back to the master branch
-  git checkout master
+  # TODO: should changable about base branch
+  curl -X POST -H "Authorization: token $access_token" -d "{\"title\":\"$pr_title\", \"head\":\"$follower_branch_name\", \"base\":\"main\", \"body\":\"$pr_body\"}" "https://api.github.com/repos/$follower_org/$follower_repo_name/pulls"
 else
   echo "No updates found in the template file."
 fi
