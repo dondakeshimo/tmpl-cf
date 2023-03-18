@@ -12,6 +12,9 @@ pr_body=$(echo "$config" | jq -r '.pr_body')
 
 access_token="${ACCESS_TOKEN}"
 
+# Add an exception for the GitHub Actions workspace
+git config --global --add safe.directory /github/workspace
+
 # Create a new branch
 # TODO: If the blanch exists in a remote repository, you should checkout the one.
 git checkout -b "$follower_branch_name"
