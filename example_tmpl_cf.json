@@ -1,5 +1,6 @@
 {
-  "github_username": "your-github-username",
+  "template_org": "template-github-organization-name",
+  "follower_org": "your-github-organization-name",
   "template_repo_name": "template-repo",
   "follower_repo_name": "my-repo",
   "access_token": "your-personal-access-token",

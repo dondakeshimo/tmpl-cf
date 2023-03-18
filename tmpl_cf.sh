@@ -2,7 +2,8 @@
 
 # Load configuration
 config="$(cat config.json)"
-github_username=$(echo "$config" | jq -r '.github_username')
+template_org=$(echo "$config" | jq -r '.template_org')
+follower_org=$(echo "$config" | jq -r '.follower_org')
 template_repo_name=$(echo "$config" | jq -r '.template_repo_name')
 follower_repo_name=$(echo "$config" | jq -r '.follower_repo_name')
 access_token=$(echo "$config" | jq -r '.access_token')
@@ -12,7 +13,7 @@ follower_commit_message=$(echo "$config" | jq -r '.follower_commit_message')
 pr_title=$(echo "$config" | jq -r '.pr_title')
 pr_body=$(echo "$config" | jq -r '.pr_body')
 
-template_repo_url="https://github.com/$github_username/$template_repo_name.git"
+template_repo_url="https://github.com/$template_org/$template_repo_name.git"
 template_repo_dir="template-repo"
 
 # Clone the template repository
@@ -74,7 +75,7 @@ if [ $create_pr -eq 1 ]; then
   git push origin "$follower_branch_name"
 
   # Create a PR using curl
-  curl -X POST -H "Authorization: token $access_token" -d "{\"title\":\"$pr_title\", \"head\":\"$follower_branch_name\", \"base\":\"master\", \"body\":\"$pr_body\"}" "https://api.github.com/repos/$github_username/$follower_repo_name/pulls"
+  curl -X POST -H "Authorization: token $access_token" -d "{\"title\":\"$pr_title\", \"head\":\"$follower_branch_name\", \"base\":\"master\", \"body\":\"$pr_body\"}" "https://api.github.com/repos/$follower_org/$follower_repo_name/pulls"
 
   # Go back to the master branch
   git checkout master
