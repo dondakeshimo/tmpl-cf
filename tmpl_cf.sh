@@ -4,12 +4,13 @@
 config="$(cat config.json)"
 follower_org=$(echo "$config" | jq -r '.follower_org')
 follower_repo_name=$(echo "$config" | jq -r '.follower_repo_name')
-access_token=$(echo "$config" | jq -r '.access_token')
 file_paths=$(echo "$config" | jq -c '.file_paths[]')
 follower_branch_name=$(echo "$config" | jq -r '.follower_branch_name')
 follower_commit_message=$(echo "$config" | jq -r '.follower_commit_message')
 pr_title=$(echo "$config" | jq -r '.pr_title')
 pr_body=$(echo "$config" | jq -r '.pr_body')
+
+access_token="${ACCESS_TOKEN}"
 
 # Create a new branch
 # TODO: If the blanch exists in a remote repository, you should checkout the one.

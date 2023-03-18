@@ -35,7 +35,6 @@ The script requires a `tmpl_cf.json` file that stores the necessary information 
 {
   "follower_org": "your-github-organization-name",
   "follower_repo_name": "my-repo",
-  "access_token": "your-personal-access-token",
   "file_paths": [
     {
       "template_repo_url": "https://github.com/your/template-repository-1",
@@ -61,6 +60,8 @@ Replace the placeholders in the `tmpl_cf.json` file with the appropriate informa
 
 ## Usage
 
+### Usage on local machine
+
 1. Clone your local repository:
 
 ```bash
@@ -75,13 +76,15 @@ cd my-repo
 
 3. Place the `tmpl_cf.json` file and the `tmpl_cf.sh` script in the root of the cloned repository.
 
-4. Ensure that the `tmpl_cf.sh` script is executable:
+4. Set your GitHub personal access token to an environment variable `ACCESS_TOKEN`.
+
+5. Ensure that the `tmpl_cf.sh` script is executable:
 
 ```bash
 chmod +x tmpl_cf.sh
 ```
 
-5. Run the script:
+6. Run the script:
 
 ```bash
 ./tmpl_cf.sh
@@ -108,9 +111,10 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Execute Template Update Action
-      uses: your-github-username/template-update-action@main
+      uses: tmpl-cf/tmpl-cf@main
       with:
         config-file: 'tmpl_cf.json'
+        access-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## Testing
