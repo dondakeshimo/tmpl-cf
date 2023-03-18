@@ -75,7 +75,7 @@ done
 
 if [ $create_pr -eq 1 ]; then
   # Update config JSON
-  echo $config > $CONFIG_FILE_PATH
+  echo $config | jq > $CONFIG_FILE_PATH
   git add $CONFIG_FILE_PATH
 
   # Commit the changes and push the branch to your repository
