@@ -74,6 +74,10 @@ for file_path in $file_paths; do
 done
 
 if [ $create_pr -eq 1 ]; then
+  # Update config JSON
+  echo $config > $CONFIG_FILE_PATH
+  git add $CONFIG_FILE_PATH
+
   # Commit the changes and push the branch to your repository
   git commit -m "$follower_commit_message"
   git push origin "$follower_branch_name"
