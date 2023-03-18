@@ -1,7 +1,6 @@
 {
-  "follower_org": "your-github-organization-name",
+  "follower_org": "my-github-organization-name",
   "follower_repo_name": "my-repo",
-  "access_token": "your-personal-access-token",
   "file_paths": [
     {
       "template_repo_url": "https://github.com/your/template-repository-1",
