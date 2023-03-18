@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eu
+
 # Load configuration
 config="$(cat $CONFIG_FILE_PATH)"
 follower_org=$(echo "$config" | jq -r '.follower_org')
