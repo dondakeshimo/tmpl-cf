@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -ex
 
 # Load configuration
 config="$(cat $CONFIG_FILE_PATH)"
@@ -37,6 +37,7 @@ for file_path in $file_paths; do
   template_repo_dir="template-repo"
 
   # Clone the template repository
+  set +e
   git clone "$template_repo_url" "$template_repo_dir"
 
   # Get the latest commit hash of the template file
