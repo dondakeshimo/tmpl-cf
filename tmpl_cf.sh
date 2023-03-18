@@ -14,6 +14,11 @@ access_token="${ACCESS_TOKEN}"
 
 # Add an exception for the GitHub Actions workspace
 git config --global --add safe.directory /github/workspace
+echo "machine github.com login $access_token" > ~/.netrc
+
+# Configure Git user information
+git config --global user.email "tmpl-cf@dondakeshimo.com"
+git config --global user.name "tmpl-cf"
 
 # Create a new branch
 # TODO: If the blanch exists in a remote repository, you should checkout the one.
