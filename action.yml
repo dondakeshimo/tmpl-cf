@@ -1,11 +1,16 @@
-name: 'Template Update Action'
+name: 'Template Continuous Following'
 description: 'Check for updates in template files and create a pull request with changes'
 inputs:
   config-file:
     description: 'Path to the configuration JSON file'
     required: true
-    default: 'config.json'
+    default: 'tmpl_cf.json'
+  access-token:
+    description: 'GitHub personal access token'
+    required: true
 
 runs:
   using: 'docker'
   image: 'Dockerfile'
+  env:
+    ACCESS_TOKEN: ${{ inputs.access-token }}
