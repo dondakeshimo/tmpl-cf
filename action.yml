@@ -1,4 +1,4 @@
-name: 'Template Continuous Following'
+name: 'tmpl-cf'
 description: 'Check for updates in template files and create a pull request with changes'
 inputs:
   config-file:
