@@ -94,7 +94,7 @@ if [ $create_pr -eq 1 ]; then
     curl -s -X POST -H "Authorization: token ${access_token}" \
       -H "Accept: application/vnd.github+json" \
       -d "{\"body\": \"$pr_body\"}" \
-      "https://api.github.com/repos/$follower_org/$follower_branch_name/pulls/${existing_pr_number}"
+      "https://api.github.com/repos/$follower_org/$follower_branch_name/issues/${existing_pr_number}/comments"
   fi
 
   # Update config JSON
