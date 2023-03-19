@@ -2,8 +2,19 @@
 
 set -eu
 
-# Load configuration
-config="$(cat $CONFIG_FILE_PATH)"
+# Load main configuration
+main_config="$(cat $CONFIG_FILE_PATH)"
+follower_branch_name=$(echo "$main_config" | jq -r '.follower_branch_name')
+
+# Checkout branch
+remote_branch_exists=$(git ls-remote --heads origin "${follower_branch_name}")
+if [ -z "${remote_branch_exists}" ]; then
+  git checkout -b "${follower_branch_name}"
+else
+  git checkout "${follower_branch_name}"
+fi
+
+# Load follower branch configuration
 follower_org=$(echo "$config" | jq -r '.follower_org')
 follower_repo_name=$(echo "$config" | jq -r '.follower_repo_name')
 file_paths=$(echo "$config" | jq -c '.file_paths[]')
@@ -20,10 +31,6 @@ git config --global --add safe.directory /github/workspace
 # Configure Git user information
 git config --global user.email "tmpl-cf@dondakeshimo.com"
 git config --global user.name "tmpl-cf"
-
-# Create a new branch
-# TODO: If the blanch exists in a remote repository, you should checkout the one.
-git checkout -b "$follower_branch_name"
 
 # Initialize a flag for PR creation
 create_pr=0
