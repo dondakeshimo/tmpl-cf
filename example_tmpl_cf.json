@@ -1,6 +1,4 @@
 {
-  "follower_org": "my-github-organization-name",
-  "follower_repo_name": "my-repo",
   "file_paths": [
     {
       "template_repo_url": "https://github.com/your/template-repository-1",
