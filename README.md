@@ -53,7 +53,7 @@ Replace the placeholders in the `tmpl_cf.json` file with the appropriate informa
 
 ## Usage
 
-Add the following to your GitHub Actions workflow file (e.g., `.github/workflows/main.yml`):
+Add the following to your GitHub Actions workflow file (e.g., `.github/workflows/tmpl-cf.yml`):
 
 ```yaml
 name: Template Continuous Following
@@ -69,14 +69,13 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+
     steps:
     - name: Check out repository
       uses: actions/checkout@v2
+
     - name: Execute tmpl-cf
       uses: dondakeshimo/tmpl-cf@main
-      with:
-        config-file: 'tmpl_cf.json'
-        access-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 Ensure that `Settings > Actions > General > Allow GitHub Actions to create and approve pull requests` is enabled.
