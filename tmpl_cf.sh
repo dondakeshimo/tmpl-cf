@@ -55,8 +55,12 @@ for file_path in $file_paths; do
 
   # Check if the template has updates
   if [ "$template_file_latest_commit" != "$last_applied_commit" ]; then
-    # Create a diff file between the template and your file
-    diff -u "$follower_file_path" "$template_repo_dir/$template_file_path" > "diff_${follower_file_path}.patch" || true
+    # Copy the lastest template file
+    cp "$template_repo_dir/$template_file_path" "$template_repo_dir/$template_file_path.last"
+
+    # Create a diff3 file between your file, the last applied template file and the latest template
+    git checkout "$last_applied_commit"
+    diff3 -E "$fo" "$follower_file_path" "$template_repo_dir/$template_file_path" "$template_repo_dir/$template_file_path.last" > "diff3_${follower_file_path}.patch" || true
 
     # Get commit messages of the template file
     cd "$template_repo_dir"
@@ -67,7 +71,7 @@ for file_path in $file_paths; do
     pr_body="$pr_body\n\nCommit messages for $template_file_path:\n$commit_messages"
 
     # Apply the diff file, add the changes, and remove the diff file
-    git apply "diff_${follower_file_path}.patch"
+    patch "$follower_file_path" < "diff_${follower_file_path}.patch"
     git add "$follower_file_path"
     rm "diff_${follower_file_path}.patch"
 
