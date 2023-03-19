@@ -63,7 +63,7 @@ for file_path in $file_paths; do
     cd ..
 
     # Create a diff3 file between your file, the last applied template file and the latest template
-    diff3 -E "$fo" "$follower_file_path" "$template_repo_dir/$template_file_path.last_applied" "$template_repo_dir/$template_file_path.lastest" > "diff3_${follower_file_path}.patch" || true
+    diff3 -E "$follower_file_path" "$template_repo_dir/$template_file_path.last_applied" "$template_repo_dir/$template_file_path.lastest" > "diff_${follower_file_path}.patch" || true
 
     # Get commit messages of the template file
     cd "$template_repo_dir"
