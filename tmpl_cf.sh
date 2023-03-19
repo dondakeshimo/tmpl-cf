@@ -1,12 +1,12 @@
 #!/bin/bash
 
-set -eux
+set -eu
 
 # Add an exception for the GitHub Actions workspace
 git config --global --add safe.directory /github/workspace
 
 # Configure Git user information
-git config --global user.email "tmpl-cf@dondakeshimo.com"
+git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 git config --global user.name "tmpl-cf"
 
 # Load configuration
