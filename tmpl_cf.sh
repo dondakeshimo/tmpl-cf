@@ -1,17 +1,26 @@
 #!/bin/bash
 
-set -eux
+set -eu
 
 # Add an exception for the GitHub Actions workspace
 git config --global --add safe.directory /github/workspace
 
 # Configure Git user information
-git config --global user.email "tmpl-cf@dondakeshimo.com"
+git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 git config --global user.name "tmpl-cf"
 
-# Load main configuration
-main_config="$(cat $CONFIG_FILE_PATH)"
-follower_branch_name=$(echo "$main_config" | jq -r '.follower_branch_name')
+# Load configuration
+config="$(cat $CONFIG_FILE_PATH)"
+follower_org=$(echo "$config" | jq -r '.follower_org')
+follower_repo_name=$(echo "$config" | jq -r '.follower_repo_name')
+follower_branch_name=$(echo "$config" | jq -r '.follower_branch_name')
+file_paths=$(echo "$config" | jq -c '.file_paths[]')
+follower_branch_name=$(echo "$config" | jq -r '.follower_branch_name')
+follower_commit_message=$(echo "$config" | jq -r '.follower_commit_message')
+pr_title=$(echo "$config" | jq -r '.pr_title')
+pr_body=$(echo "$config" | jq -r '.pr_body')
+
+access_token="${ACCESS_TOKEN}"
 
 # Checkout branch
 remote_branch_exists=$(git ls-remote --heads origin "${follower_branch_name}")
@@ -21,18 +30,6 @@ else
   git fetch
   git checkout "${follower_branch_name}"
 fi
-
-# Load follower branch configuration
-config="$(cat $CONFIG_FILE_PATH)"
-follower_org=$(echo "$config" | jq -r '.follower_org')
-follower_repo_name=$(echo "$config" | jq -r '.follower_repo_name')
-file_paths=$(echo "$config" | jq -c '.file_paths[]')
-follower_branch_name=$(echo "$config" | jq -r '.follower_branch_name')
-follower_commit_message=$(echo "$config" | jq -r '.follower_commit_message')
-pr_title=$(echo "$config" | jq -r '.pr_title')
-pr_body=$(echo "$config" | jq -r '.pr_body')
-
-access_token="${ACCESS_TOKEN}"
 
 # Initialize a flag for PR creation
 create_pr=0
@@ -45,6 +42,9 @@ for file_path in $file_paths; do
   last_applied_commit=$(echo "$file_path" | jq -r '.last_applied_commit')
   template_repo_dir="template-repo"
 
+  # Extract last applied commit to the follower branch
+  branch_last_applied_commit=$(cat "$CONFIG_FILE_PATH" | jq -r ".file_paths[] | select(.template_file_path == \"$template_file_path\" and .follower_file_path == \"$follower_file_path\") | .last_applied_commit")
+
   # Clone the template repository
   git clone "$template_repo_url" "$template_repo_dir" || true
 
@@ -54,9 +54,21 @@ for file_path in $file_paths; do
   cd ..
 
   # Check if the template has updates
-  if [ "$template_file_latest_commit" != "$last_applied_commit" ]; then
-    # Create a diff file between the template and your file
-    diff -u "$follower_file_path" "$template_repo_dir/$template_file_path" > "diff_${follower_file_path}.patch" || true
+  if [ "$template_file_latest_commit" != "$branch_last_applied_commit" ]; then
+    # Copy the lastest template file
+    cd "$template_repo_dir"
+    cp "$template_file_path" "$template_file_path.latest"
+    git checkout "$last_applied_commit"
+    cp "$template_file_path" "$template_file_path.last_applied"
+    cd ..
+
+    # Create a 3way-merge file between your file, the last applied template file and the latest template
+    git checkout main
+    diff3 -m -E "$follower_file_path" "$template_repo_dir/$template_file_path.last_applied" "$template_repo_dir/$template_file_path.latest" > "$follower_file_path.merged" || true
+    git checkout $follower_branch_name
+    cp "$follower_file_path.merged" $follower_file_path
+    rm "$follower_file_path.merged"
+    git add "$follower_file_path"
 
     # Get commit messages of the template file
     cd "$template_repo_dir"
@@ -65,11 +77,6 @@ for file_path in $file_paths; do
 
     # Update the PR body with commit messages
     pr_body="$pr_body\n\nCommit messages for $template_file_path:\n$commit_messages"
-
-    # Apply the diff file, add the changes, and remove the diff file
-    git apply "diff_${follower_file_path}.patch"
-    git add "$follower_file_path"
-    rm "diff_${follower_file_path}.patch"
 
     # Set the flag to create PR
     create_pr=1
@@ -107,7 +114,8 @@ if [ $create_pr -eq 1 ]; then
   # Create a PR using curl
   if [ -z "${existing_pr}" ]; then
     # TODO: should changable about base branch
-    curl -X POST -H "Authorization: token $access_token" -d "{\"title\":\"$pr_title\", \"head\":\"$follower_branch_name\", \"base\":\"main\", \"body\":\"$pr_body\"}" "https://api.github.com/repos/$follower_org/$follower_repo_name/pulls"
+    curl -X POST -H "Authorization: token $access_token" \
+      -d "{\"title\":\"$pr_title\", \"head\":\"$follower_branch_name\", \"base\":\"main\", \"body\":\"$pr_body\"}" "https://api.github.com/repos/$follower_org/$follower_repo_name/pulls"
   fi
 else
   echo "No updates found in the template file."
