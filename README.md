@@ -2,36 +2,27 @@
 
 _TeMPLate Continuous Following_
 
-This Shell script automates the process of checking for updates in template files from multiple remote repositories and merging the changes into corresponding follower files in a local repository. The script also creates a pull request in the local repository whenever there are updates to the template files.
+A GitHub Action that automates the process of checking for updates in template files from multiple remote repositories and merging the changes into corresponding follower files in a your repository. The action also creates a pull request in the your repository whenever there are updates to the template files.
 
 ## Table of Contents
 
 - [Features](#features)
-- [Requirements](#requirements)
 - [Configuration](#configuration)
 - [Usage](#usage)
-- [Testing](#testing)
 - [License](#license)
 
 ## Features
 
 - Supports multiple template repositories
 - Supports multiple template files in each repository
-- Supports multiple local files corresponding to the template files
+- Supports multiple files corresponding to the template files
 - Automatically checks for updates in the template files
-- Merges the changes into the local files when updates are detected
-- Creates a pull request in the local repository for the updated files
-
-## Requirements
-
-- Git
-- Bash
-- [jq](https://stedolan.github.io/jq/) command-line JSON processor
-- A GitHub account with appropriate access to the repositories
+- Merges the changes into the your files when updates are detected
+- Creates a pull request in the your repository for the updated files
 
 ## Configuration
 
-The script requires a `tmpl_cf.json` file that stores the necessary information for the script execution:
+The action requires a `tmpl_cf.json` file that stores the necessary information for the action execution:
 
 ```json
 {
@@ -58,48 +49,14 @@ The script requires a `tmpl_cf.json` file that stores the necessary information 
 }
 ```
 
-Replace the placeholders in the `tmpl_cf.json` file with the appropriate information for your GitHub repositories and personal access token. The personal access token should have the necessary permissions to perform the required actions, such as creating a pull request.
+Replace the placeholders in the `tmpl_cf.json` file with the appropriate information for your GitHub repositories.
 
 ## Usage
 
-### Usage on local machine
-
-1. Clone your local repository:
-
-```bash
-git clone https://github.com/your-github-username/my-repo.git
-```
-
-2. Change the current directory to the cloned repository:
-
-```bash
-cd my-repo
-```
-
-3. Place the `tmpl_cf.json` file and the `tmpl_cf.sh` script in the root of the cloned repository.
-
-4. Set your GitHub personal access token to an environment variable `ACCESS_TOKEN`.
-
-5. Ensure that the `tmpl_cf.sh` script is executable:
-
-```bash
-chmod +x tmpl_cf.sh
-```
-
-6. Run the script:
-
-```bash
-./tmpl_cf.sh
-```
-
-The script will check for updates in the template files, merge the changes into the corresponding local files, and create a pull request in the local repository if updates were detected.
-
-### Usage With GitHub Action
-
-Ensure that `Settings > Actions > General > Allow GitHub Actions to create and approve pull requests` is enabled.
+Add the following to your GitHub Actions workflow file (e.g., `.github/workflows/main.yml`):
 
 ```yaml
-name: Template Update
+name: Template Continuous Following
 
 on:
   schedule:
@@ -107,27 +64,22 @@ on:
   workflow_dispatch: # Allow manual trigger
 
 jobs:
-  check_template_updates:
+  follow_template_updates:
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
-
-
     steps:
     - name: Check out repository
       uses: actions/checkout@v2
-
-    - name: Execute Template Update Action
-      uses: tmpl-cf/tmpl-cf@main
+    - name: Execute tmpl-cf
+      uses: dondakeshimo/tmpl-cf@main
       with:
         config-file: 'tmpl_cf.json'
         access-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-## Testing
-
-A test scenario is provided in the [Product Requirements Document](PRD.md) to verify the script's functionality. Follow the steps in the scenario to ensure that the script correctly updates the local files based on the template files and creates pull requests.
+Ensure that `Settings > Actions > General > Allow GitHub Actions to create and approve pull requests` is enabled.
 
 ## License
 
