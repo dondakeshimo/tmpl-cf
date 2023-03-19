@@ -11,15 +11,14 @@ git config --global user.name "tmpl-cf"
 
 # Load configuration
 config="$(cat $CONFIG_FILE_PATH)"
-follower_org=$(echo "$config" | jq -r '.follower_org')
-follower_repo_name=$(echo "$config" | jq -r '.follower_repo_name')
-follower_branch_name=$(echo "$config" | jq -r '.follower_branch_name')
 file_paths=$(echo "$config" | jq -c '.file_paths[]')
 follower_branch_name=$(echo "$config" | jq -r '.follower_branch_name')
 follower_commit_message=$(echo "$config" | jq -r '.follower_commit_message')
 pr_title=$(echo "$config" | jq -r '.pr_title')
 pr_body=$(echo "$config" | jq -r '.pr_body')
 
+follower_org="${GITHUB_REPOSITORY_OWNER}"
+follower_repo_name="${GITHUB_REPOSITORY}"
 access_token="${ACCESS_TOKEN}"
 
 # Checkout branch
