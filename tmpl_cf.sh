@@ -62,8 +62,9 @@ for file_path in $file_paths; do
     cp "$template_file_path" "$template_file_path.last_applied"
     cd ..
 
-    # Create a diff3 file between your file, the last applied template file and the latest template
-    diff3 -E "$follower_file_path" "$template_repo_dir/$template_file_path.last_applied" "$template_repo_dir/$template_file_path.lastest" > "diff_${follower_file_path}.patch" || true
+    # Create a 3way-merge file between your file, the last applied template file and the latest template
+    diff3 -m -E "$follower_file_path" "$template_repo_dir/$template_file_path.last_applied" "$template_repo_dir/$template_file_path.lastest" > "$follower_file_path" || true
+    git add "$follower_file_path"
 
     # Get commit messages of the template file
     cd "$template_repo_dir"
@@ -72,11 +73,6 @@ for file_path in $file_paths; do
 
     # Update the PR body with commit messages
     pr_body="$pr_body\n\nCommit messages for $template_file_path:\n$commit_messages"
-
-    # Apply the diff file, add the changes, and remove the diff file
-    patch "$follower_file_path" < "diff_${follower_file_path}.patch"
-    git add "$follower_file_path"
-    rm "diff_${follower_file_path}.patch"
 
     # Set the flag to create PR
     create_pr=1
