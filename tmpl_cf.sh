@@ -88,13 +88,12 @@ if [ $create_pr -eq 1 ]; then
   existing_pr=$(curl -s -H "Authorization: token ${access_token}" \
     "https://api.github.com/repos/$follower_org/$follower_repo_name/pulls?state=open" | jq ".[] | select(.head.ref == \"${follower_branch_name}\")")
 
-  # Close the former PR
+  # Create a new comment to the PR
   if [ -n "${existing_pr}" ]; then
-    echo "A pull request already exists for the branch ${follower_branch_name}. Closing the existing PR."
     existing_pr_number=$(echo "${existing_pr}" | jq ".number")
-    curl -s -X PATCH -H "Authorization: token ${access_token}" \
+    curl -s -X POST -H "Authorization: token ${access_token}" \
       -H "Accept: application/vnd.github+json" \
-      -d '{"state": "closed"}' \
+      -d "{\"body\": \"$pr_body\"}" \
       "https://api.github.com/repos/$follower_org/$follower_branch_name/pulls/${existing_pr_number}"
   fi
 
@@ -107,9 +106,10 @@ if [ $create_pr -eq 1 ]; then
   git push origin "$follower_branch_name"
 
   # Create a PR using curl
-  # TODO: should changable about base branch
-  echo $pr_body
-  curl -X POST -H "Authorization: token $access_token" -d "{\"title\":\"$pr_title\", \"head\":\"$follower_branch_name\", \"base\":\"main\", \"body\":\"$pr_body\"}" "https://api.github.com/repos/$follower_org/$follower_repo_name/pulls"
+  if [ -z "${existing_pr}" ]; then
+    # TODO: should changable about base branch
+    curl -X POST -H "Authorization: token $access_token" -d "{\"title\":\"$pr_title\", \"head\":\"$follower_branch_name\", \"base\":\"main\", \"body\":\"$pr_body\"}" "https://api.github.com/repos/$follower_org/$follower_repo_name/pulls"
+  fi
 else
   echo "No updates found in the template file."
 fi
