@@ -3,15 +3,14 @@ description: 'Check for updates in template files and create a pull request with
 inputs:
   config-file:
     description: 'Path to the configuration JSON file'
-    required: true
     default: 'tmpl_cf.json'
-  access-token:
+  token:
     description: 'GitHub personal access token'
-    required: true
+    default: ${{ github.token }}
 
 runs:
   using: 'docker'
   image: 'Dockerfile'
   env:
-    ACCESS_TOKEN: ${{ inputs.access-token }}
+    ACCESS_TOKEN: ${{ inputs.token }}
     CONFIG_FILE_PATH: ${{ inputs.config-file }}

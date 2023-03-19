@@ -1,6 +1,13 @@
 #!/bin/bash
 
-set -eu
+set -eux
+
+# Add an exception for the GitHub Actions workspace
+git config --global --add safe.directory /github/workspace
+
+# Configure Git user information
+git config --global user.email "tmpl-cf@dondakeshimo.com"
+git config --global user.name "tmpl-cf"
 
 # Load main configuration
 main_config="$(cat $CONFIG_FILE_PATH)"
@@ -11,10 +18,12 @@ remote_branch_exists=$(git ls-remote --heads origin "${follower_branch_name}")
 if [ -z "${remote_branch_exists}" ]; then
   git checkout -b "${follower_branch_name}"
 else
+  git fetch
   git checkout "${follower_branch_name}"
 fi
 
 # Load follower branch configuration
+config="$(cat $CONFIG_FILE_PATH)"
 follower_org=$(echo "$config" | jq -r '.follower_org')
 follower_repo_name=$(echo "$config" | jq -r '.follower_repo_name')
 file_paths=$(echo "$config" | jq -c '.file_paths[]')
@@ -24,13 +33,6 @@ pr_title=$(echo "$config" | jq -r '.pr_title')
 pr_body=$(echo "$config" | jq -r '.pr_body')
 
 access_token="${ACCESS_TOKEN}"
-
-# Add an exception for the GitHub Actions workspace
-git config --global --add safe.directory /github/workspace
-
-# Configure Git user information
-git config --global user.email "tmpl-cf@dondakeshimo.com"
-git config --global user.name "tmpl-cf"
 
 # Initialize a flag for PR creation
 create_pr=0
@@ -85,14 +87,13 @@ if [ $create_pr -eq 1 ]; then
   existing_pr=$(curl -s -H "Authorization: token ${access_token}" \
     "https://api.github.com/repos/$follower_org/$follower_repo_name/pulls?state=open" | jq ".[] | select(.head.ref == \"${follower_branch_name}\")")
 
-  # Close the former PR
+  # Create a new comment to the PR
   if [ -n "${existing_pr}" ]; then
-    echo "A pull request already exists for the branch ${follower_branch_name}. Closing the existing PR."
     existing_pr_number=$(echo "${existing_pr}" | jq ".number")
-    curl -s -X PATCH -H "Authorization: token ${access_token}" \
+    curl -s -X POST -H "Authorization: token ${access_token}" \
       -H "Accept: application/vnd.github+json" \
-      -d '{"state": "closed"}' \
-      "https://api.github.com/repos/$follower_org/$follower_branch_name/pulls/${existing_pr_number}"
+      -d "{\"body\": \"$pr_body\"}" \
+      "https://api.github.com/repos/$follower_org/$follower_repo_name/issues/${existing_pr_number}/comments"
   fi
 
   # Update config JSON
@@ -104,9 +105,10 @@ if [ $create_pr -eq 1 ]; then
   git push origin "$follower_branch_name"
 
   # Create a PR using curl
-  # TODO: should changable about base branch
-  echo $pr_body
-  curl -X POST -H "Authorization: token $access_token" -d "{\"title\":\"$pr_title\", \"head\":\"$follower_branch_name\", \"base\":\"main\", \"body\":\"$pr_body\"}" "https://api.github.com/repos/$follower_org/$follower_repo_name/pulls"
+  if [ -z "${existing_pr}" ]; then
+    # TODO: should changable about base branch
+    curl -X POST -H "Authorization: token $access_token" -d "{\"title\":\"$pr_title\", \"head\":\"$follower_branch_name\", \"base\":\"main\", \"body\":\"$pr_body\"}" "https://api.github.com/repos/$follower_org/$follower_repo_name/pulls"
+  fi
 else
   echo "No updates found in the template file."
 fi
