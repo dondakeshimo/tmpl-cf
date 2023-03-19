@@ -2,7 +2,7 @@
 
 _TeMPLate Continuous Following_
 
-A GitHub Action that automates the process of checking for updates in template files from multiple remote repositories and merging the changes into corresponding follower files in a local repository. The action also creates a pull request in the local repository whenever there are updates to the template files.
+A GitHub Action that automates the process of checking for updates in template files from multiple remote repositories and merging the changes into corresponding follower files in a your repository. The action also creates a pull request in the your repository whenever there are updates to the template files.
 
 ## Table of Contents
 
@@ -15,10 +15,10 @@ A GitHub Action that automates the process of checking for updates in template f
 
 - Supports multiple template repositories
 - Supports multiple template files in each repository
-- Supports multiple local files corresponding to the template files
+- Supports multiple files corresponding to the template files
 - Automatically checks for updates in the template files
-- Merges the changes into the local files when updates are detected
-- Creates a pull request in the local repository for the updated files
+- Merges the changes into the your files when updates are detected
+- Creates a pull request in the your repository for the updated files
 
 ## Configuration
 
@@ -56,7 +56,7 @@ Replace the placeholders in the `tmpl_cf.json` file with the appropriate informa
 Add the following to your GitHub Actions workflow file (e.g., `.github/workflows/main.yml`):
 
 ```yaml
-name: Template Update
+name: Template Continuous Following
 
 on:
   schedule:
@@ -64,7 +64,7 @@ on:
   workflow_dispatch: # Allow manual trigger
 
 jobs:
-  check_template_updates:
+  follow_template_updates:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -72,8 +72,8 @@ jobs:
     steps:
     - name: Check out repository
       uses: actions/checkout@v2
-    - name: Execute Template Update Action
-      uses: tmpl-cf/tmpl-cf@main
+    - name: Execute tmpl-cf
+      uses: dondakeshimo/tmpl-cf@main
       with:
         config-file: 'tmpl_cf.json'
         access-token: ${{ secrets.GITHUB_TOKEN }}
