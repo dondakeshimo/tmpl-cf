@@ -81,6 +81,20 @@ for file_path in $file_paths; do
 done
 
 if [ $create_pr -eq 1 ]; then
+  # Check if the PR is already exists
+  existing_pr=$(curl -s -H "Authorization: token ${access_token}" \
+    "https://api.github.com/repos/$follower_org/$follower_repo_name/pulls?state=open" | jq ".[] | select(.head.ref == \"${follower_branch_name}\")")
+
+  # Close the former PR
+  if [ -n "${existing_pr}" ]; then
+    echo "A pull request already exists for the branch ${follower_branch_name}. Closing the existing PR."
+    existing_pr_number=$(echo "${existing_pr}" | jq ".number")
+    curl -s -X PATCH -H "Authorization: token ${access_token}" \
+      -H "Accept: application/vnd.github+json" \
+      -d '{"state": "closed"}' \
+      "https://api.github.com/repos/$follower_org/$follower_branch_name/pulls/${existing_pr_number}"
+  fi
+
   # Update config JSON
   echo $config | jq > $CONFIG_FILE_PATH
   git add $CONFIG_FILE_PATH
