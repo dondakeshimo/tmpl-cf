@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eux
+set -eu
 
 # Add an exception for the GitHub Actions workspace
 git config --global --add safe.directory /github/workspace
@@ -59,6 +59,7 @@ for file_path in $file_paths; do
     cp "$template_file_path" "$template_file_path.latest"
     git checkout "$last_applied_commit"
     cp "$template_file_path" "$template_file_path.last_applied"
+    git checkout "$template_file_latest_commit"
     cd ..
 
     # Create a 3way-merge file between your file, the last applied template file and the latest template
