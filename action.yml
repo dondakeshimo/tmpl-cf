@@ -12,5 +12,5 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   env:
-    ACCESS_TOKEN: ${{ inputs.access-token }}
+    ACCESS_TOKEN: ${{ inputs.token }}
     CONFIG_FILE_PATH: ${{ inputs.config-file }}
