@@ -7,6 +7,7 @@ main_config="$(cat $CONFIG_FILE_PATH)"
 follower_branch_name=$(echo "$main_config" | jq -r '.follower_branch_name')
 
 # Checkout branch
+echo $(git remote -v)
 remote_branch_exists=$(git ls-remote --heads origin "${follower_branch_name}")
 if [ -z "${remote_branch_exists}" ]; then
   git checkout -b "${follower_branch_name}"
