@@ -58,19 +58,15 @@ for file_path in $file_paths; do
     # Copy the lastest template file
     cd "$template_repo_dir"
     cp "$template_file_path" "$template_file_path.latest"
-    ls
-    cat $template_file_path.latest
     git checkout "$last_applied_commit"
-    ls
     cp "$template_file_path" "$template_file_path.last_applied"
     cd ..
 
-    cat $follower_file_path
-    cat "$template_repo_dir/$template_file_path.last_applied"
-    cat "$template_repo_dir/$template_file_path.latest"
-
     # Create a 3way-merge file between your file, the last applied template file and the latest template
-    diff3 -m -E "$follower_file_path" "$template_repo_dir/$template_file_path.last_applied" "$template_repo_dir/$template_file_path.latest" > "$follower_file_path" || true
+    git checkout $(git merge-base $follower_branch_name main)
+    diff3 -m -E "$follower_file_path" "$template_repo_dir/$template_file_path.last_applied" "$template_repo_dir/$template_file_path.latest" > "$follower_file_path.merged" || true
+    git checkout $follower_branch_name
+    cp "$follower_file_path.merged" $follower_file_path
     git add "$follower_file_path"
 
     # Get commit messages of the template file
