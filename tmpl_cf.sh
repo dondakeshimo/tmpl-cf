@@ -24,6 +24,7 @@ else
 fi
 
 # Load follower branch configuration
+config="$(cat $CONFIG_FILE_PATH)"
 follower_org=$(echo "$config" | jq -r '.follower_org')
 follower_repo_name=$(echo "$config" | jq -r '.follower_repo_name')
 file_paths=$(echo "$config" | jq -c '.file_paths[]')
