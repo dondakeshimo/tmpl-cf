@@ -71,7 +71,7 @@ for file_path in $file_paths; do
 
     # Get commit messages of the template file
     cd "$template_repo_dir"
-    commit_messages=$(git log --pretty=format:"%h - %s" $last_applied_commit.. -- "$template_file_path")
+    commit_messages=$(git log --pretty=format:"* %h - %s" $last_applied_commit.. -- "$template_file_path")
     cd ..
 
     # Update the PR body with commit messages
