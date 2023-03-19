@@ -9,9 +9,18 @@ git config --global --add safe.directory /github/workspace
 git config --global user.email "tmpl-cf@dondakeshimo.com"
 git config --global user.name "tmpl-cf"
 
-# Load main configuration
-main_config="$(cat $CONFIG_FILE_PATH)"
-follower_branch_name=$(echo "$main_config" | jq -r '.follower_branch_name')
+# Load configuration
+config="$(cat $CONFIG_FILE_PATH)"
+follower_org=$(echo "$config" | jq -r '.follower_org')
+follower_repo_name=$(echo "$config" | jq -r '.follower_repo_name')
+follower_branch_name=$(echo "$config" | jq -r '.follower_branch_name')
+file_paths=$(echo "$config" | jq -c '.file_paths[]')
+follower_branch_name=$(echo "$config" | jq -r '.follower_branch_name')
+follower_commit_message=$(echo "$config" | jq -r '.follower_commit_message')
+pr_title=$(echo "$config" | jq -r '.pr_title')
+pr_body=$(echo "$config" | jq -r '.pr_body')
+
+access_token="${ACCESS_TOKEN}"
 
 # Checkout branch
 remote_branch_exists=$(git ls-remote --heads origin "${follower_branch_name}")
@@ -21,18 +30,6 @@ else
   git fetch
   git checkout "${follower_branch_name}"
 fi
-
-# Load follower branch configuration
-config="$(cat $CONFIG_FILE_PATH)"
-follower_org=$(echo "$config" | jq -r '.follower_org')
-follower_repo_name=$(echo "$config" | jq -r '.follower_repo_name')
-file_paths=$(echo "$config" | jq -c '.file_paths[]')
-follower_branch_name=$(echo "$config" | jq -r '.follower_branch_name')
-follower_commit_message=$(echo "$config" | jq -r '.follower_commit_message')
-pr_title=$(echo "$config" | jq -r '.pr_title')
-pr_body=$(echo "$config" | jq -r '.pr_body')
-
-access_token="${ACCESS_TOKEN}"
 
 # Initialize a flag for PR creation
 create_pr=0
@@ -64,6 +61,9 @@ for file_path in $file_paths; do
 
     # Create a 3way-merge file between your file, the last applied template file and the latest template
     git checkout $(git merge-base $follower_branch_name main)
+
+    cat $follower_file_path
+
     diff3 -m -E "$follower_file_path" "$template_repo_dir/$template_file_path.last_applied" "$template_repo_dir/$template_file_path.latest" > "$follower_file_path.merged" || true
     git checkout $follower_branch_name
     cp "$follower_file_path.merged" $follower_file_path
