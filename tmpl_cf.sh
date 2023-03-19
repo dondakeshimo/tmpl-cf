@@ -42,6 +42,9 @@ for file_path in $file_paths; do
   last_applied_commit=$(echo "$file_path" | jq -r '.last_applied_commit')
   template_repo_dir="template-repo"
 
+  # Extract last applied commit to the follower branch
+  branch_last_applied_commit=$(cat "$CONFIG_FILE_PATH" | jq -r ".file_paths[] | select(.template_file_path == \"$template_file_path\" and .follower_file_path == \"$follower_file_path\") | .last_applied_commit")
+
   # Clone the template repository
   git clone "$template_repo_url" "$template_repo_dir" || true
 
@@ -51,7 +54,7 @@ for file_path in $file_paths; do
   cd ..
 
   # Check if the template has updates
-  if [ "$template_file_latest_commit" != "$last_applied_commit" ]; then
+  if [ "$template_file_latest_commit" != "$branch_last_applied_commit" ]; then
     # Copy the lastest template file
     cd "$template_repo_dir"
     cp "$template_file_path" "$template_file_path.latest"
