@@ -19,7 +19,8 @@ remote_branch_exists=$(git ls-remote --heads origin "${follower_branch_name}")
 if [ -z "${remote_branch_exists}" ]; then
   git checkout -b "${follower_branch_name}"
 else
-  git checkout -b "${follower_branch_name}" origin/"${follower_branch_name}"
+  git fetch
+  git checkout "${follower_branch_name}"
 fi
 
 # Load follower branch configuration
