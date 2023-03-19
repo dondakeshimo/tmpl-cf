@@ -13,6 +13,7 @@ git config --global user.name "tmpl-cf"
 config="$(cat $CONFIG_FILE_PATH)"
 file_paths=$(echo "$config" | jq -c '.file_paths[]')
 follower_branch_name=$(echo "$config" | jq -r '.follower_branch_name')
+base_branch_name=$(echo "$config" | jq -r '.base_branch_name')
 follower_commit_message=$(echo "$config" | jq -r '.follower_commit_message')
 pr_title=$(echo "$config" | jq -r '.pr_title')
 pr_body=$(echo "$config" | jq -r '.pr_body')
@@ -62,7 +63,7 @@ for file_path in $file_paths; do
     cd ..
 
     # Create a 3way-merge file between your file, the last applied template file and the latest template
-    git checkout main
+    git checkout $base_branch_name
     diff3 -m -E "$follower_file_path" "$template_repo_dir/$template_file_path.last_applied" "$template_repo_dir/$template_file_path.latest" > "$follower_file_path.merged" || true
     git checkout $follower_branch_name
     cp "$follower_file_path.merged" $follower_file_path
@@ -114,7 +115,7 @@ if [ $create_pr -eq 1 ]; then
   if [ -z "${existing_pr}" ]; then
     # TODO: should changable about base branch
     curl -X POST -H "Authorization: token $access_token" \
-      -d "{\"title\":\"$pr_title\", \"head\":\"$follower_branch_name\", \"base\":\"main\", \"body\":\"$pr_body\"}" "https://api.github.com/repos/$follower_org/$follower_repo_name/pulls"
+      -d "{\"title\":\"$pr_title\", \"head\":\"$follower_branch_name\", \"base\":\"$base_branch_name\", \"body\":\"$pr_body\"}" "https://api.github.com/repos/$follower_org/$follower_repo_name/pulls"
   fi
 else
   echo "No updates found in the template file."
