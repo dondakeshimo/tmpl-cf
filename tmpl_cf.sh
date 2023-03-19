@@ -18,7 +18,6 @@ follower_commit_message=$(echo "$config" | jq -r '.follower_commit_message')
 pr_title=$(echo "$config" | jq -r '.pr_title')
 pr_body=$(echo "$config" | jq -r '.pr_body')
 
-follower_org="${GITHUB_REPOSITORY_OWNER}"
 follower_repo_name="${GITHUB_REPOSITORY}"
 access_token="${ACCESS_TOKEN}"
 
@@ -92,7 +91,7 @@ done
 if [ $create_pr -eq 1 ]; then
   # Check if the PR is already exists
   existing_pr=$(curl -s -H "Authorization: token ${access_token}" \
-    "https://api.github.com/repos/$follower_org/$follower_repo_name/pulls?state=open" | jq ".[] | select(.head.ref == \"${follower_branch_name}\")")
+    "https://api.github.com/repos/$follower_repo_name/pulls?state=open" | jq ".[] | select(.head.ref == \"${follower_branch_name}\")")
 
   # Create a new comment to the PR
   if [ -n "${existing_pr}" ]; then
@@ -100,7 +99,7 @@ if [ $create_pr -eq 1 ]; then
     curl -s -X POST -H "Authorization: token ${access_token}" \
       -H "Accept: application/vnd.github+json" \
       -d "{\"body\": \"$pr_body\"}" \
-      "https://api.github.com/repos/$follower_org/$follower_repo_name/issues/${existing_pr_number}/comments"
+      "https://api.github.com/repos/$follower_repo_name/issues/${existing_pr_number}/comments"
   fi
 
   # Update config JSON
@@ -115,7 +114,7 @@ if [ $create_pr -eq 1 ]; then
   if [ -z "${existing_pr}" ]; then
     # TODO: should changable about base branch
     curl -X POST -H "Authorization: token $access_token" \
-      -d "{\"title\":\"$pr_title\", \"head\":\"$follower_branch_name\", \"base\":\"$base_branch_name\", \"body\":\"$pr_body\"}" "https://api.github.com/repos/$follower_org/$follower_repo_name/pulls"
+      -d "{\"title\":\"$pr_title\", \"head\":\"$follower_branch_name\", \"base\":\"$base_branch_name\", \"body\":\"$pr_body\"}" "https://api.github.com/repos/$follower_repo_name/pulls"
   fi
 else
   echo "No updates found in the template file."
