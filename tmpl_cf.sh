@@ -58,8 +58,10 @@ for file_path in $file_paths; do
     # Copy the lastest template file
     cd "$template_repo_dir"
     cp "$template_file_path" "$template_file_path.latest"
+    ls
     cat $template_file_path.latest
     git checkout "$last_applied_commit"
+    ls
     cp "$template_file_path" "$template_file_path.last_applied"
     cd ..
 
