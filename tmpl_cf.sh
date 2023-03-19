@@ -2,6 +2,13 @@
 
 set -eu
 
+# Add an exception for the GitHub Actions workspace
+git config --global --add safe.directory /github/workspace
+
+# Configure Git user information
+git config --global user.email "tmpl-cf@dondakeshimo.com"
+git config --global user.name "tmpl-cf"
+
 # Load main configuration
 main_config="$(cat $CONFIG_FILE_PATH)"
 follower_branch_name=$(echo "$main_config" | jq -r '.follower_branch_name')
@@ -25,13 +32,6 @@ pr_title=$(echo "$config" | jq -r '.pr_title')
 pr_body=$(echo "$config" | jq -r '.pr_body')
 
 access_token="${ACCESS_TOKEN}"
-
-# Add an exception for the GitHub Actions workspace
-git config --global --add safe.directory /github/workspace
-
-# Configure Git user information
-git config --global user.email "tmpl-cf@dondakeshimo.com"
-git config --global user.name "tmpl-cf"
 
 # Initialize a flag for PR creation
 create_pr=0
