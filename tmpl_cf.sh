@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eux
+set -eu
 
 # Add an exception for the GitHub Actions workspace
 git config --global --add safe.directory /github/workspace
@@ -72,7 +72,7 @@ for file_path in $file_paths; do
 
     # Get commit messages of the template file
     cd "$template_repo_dir"
-    commit_messages=$(git log --pretty=format:"%h - %s" $last_applied_commit.. -- "$template_file_path")
+    commit_messages=$(git log --pretty=format:"* %h - %s" $last_applied_commit.. -- "$template_file_path")
     cd ..
 
     # Update the PR body with commit messages
@@ -97,7 +97,6 @@ if [ $create_pr -eq 1 ]; then
   # Create a new comment to the PR
   if [ -n "${existing_pr}" ]; then
     existing_pr_number=$(echo "${existing_pr}" | jq ".number")
-    echo -e $pr_body
     curl -s -X POST -H "Authorization: token ${access_token}" \
       -H "Accept: application/vnd.github+json" \
       -d "$(jq -n -c --arg body "$(echo -e "$pr_body")" '{"body": $body}')" \
