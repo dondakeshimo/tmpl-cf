@@ -26,8 +26,6 @@ The action requires a `tmpl_cf.json` file that stores the necessary information 
 
 ```json
 {
-  "follower_org": "your-github-organization-name",
-  "follower_repo_name": "my-repo",
   "file_paths": [
     {
       "template_repo_url": "https://github.com/your/template-repository-1",
@@ -42,7 +40,8 @@ The action requires a `tmpl_cf.json` file that stores the necessary information 
       "last_applied_commit": "commit-hash-2"
     }
   ],
-  "follower_branch_name": "main",
+  "follower_branch_name": "tmpl-cf",
+  "base_branch_name": "main",
   "follower_commit_message": "[tmpl-cf] Update my files with latest template changes",
   "pr_title": "[tmpl-cf] Update my files with latest template changes",
   "pr_body": "This PR updates my files with the latest changes made in the templates."
