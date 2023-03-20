@@ -99,7 +99,7 @@ if [ $create_pr -eq 1 ]; then
     existing_pr_number=$(echo "${existing_pr}" | jq ".number")
     curl -s -X POST -H "Authorization: token ${access_token}" \
       -H "Accept: application/vnd.github+json" \
-      -d "{\"body\": \"$pr_body\"}" \
+      -d $(jq -n --arg body $pr_body '{"body": $body}') \
       "https://api.github.com/repos/$follower_repo_name/issues/${existing_pr_number}/comments"
   fi
 
@@ -119,7 +119,7 @@ if [ $create_pr -eq 1 ]; then
         --arg body $pr_body \
         --arg head $follower_branch_name \
         --arg base $base_branch_name \
-        '{"title":"$title", "head":"$head", "base":"$base", "body":"$body"}') \
+        '{"title":$title, "head":$head, "base":$base, "body":$body}') \
       "https://api.github.com/repos/$follower_repo_name/pulls"
   fi
 else
