@@ -97,6 +97,10 @@ if [ $create_pr -eq 1 ]; then
   # Create a new comment to the PR
   if [ -n "${existing_pr}" ]; then
     existing_pr_number=$(echo "${existing_pr}" | jq ".number")
+
+    # NOTE: decode \n
+    pr_body="$(echo "$pr_body")"
+
     curl -s -X POST -H "Authorization: token ${access_token}" \
       -H "Accept: application/vnd.github+json" \
       -d "$(jq -n -c --arg body "$pr_body" '{"body": $body}')" \
@@ -114,7 +118,7 @@ if [ $create_pr -eq 1 ]; then
   # Create a PR using curl
   if [ -z "${existing_pr}" ]; then
     curl -X POST -H "Authorization: token $access_token" \
-      -d $(jq -n \n
+      -d $(jq -n -c \
         --arg title "$pr_title" \
         --arg body "$pr_body" \
         --arg head "$follower_branch_name" \
