@@ -113,9 +113,14 @@ if [ $create_pr -eq 1 ]; then
 
   # Create a PR using curl
   if [ -z "${existing_pr}" ]; then
-    # TODO: should changable about base branch
     curl -X POST -H "Authorization: token $access_token" \
-      -d "{\"title\":\"$pr_title\", \"head\":\"$follower_branch_name\", \"base\":\"$base_branch_name\", \"body\":\"$pr_body\"}" "https://api.github.com/repos/$follower_repo_name/pulls"
+      -d $(jq -n \n
+        --arg title $pr_title \
+        --arg body $pr_body \
+        --arg head $follower_branch_name \
+        --arg base $base_branch_name \
+        '{"title":"$title", "head":"$head", "base":"$base", "body":"$body"}') \
+      "https://api.github.com/repos/$follower_repo_name/pulls"
   fi
 else
   echo "No updates found in the template file."
