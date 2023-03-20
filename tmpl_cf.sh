@@ -114,12 +114,7 @@ if [ $create_pr -eq 1 ]; then
   # Create a PR using curl
   if [ -z "${existing_pr}" ]; then
     curl -X POST -H "Authorization: token $access_token" \
-      -d $(jq -n -c \
-        --arg title "$pr_title" \
-        --arg body "$(echo -e "$pr_body")" \
-        --arg head "$follower_branch_name" \
-        --arg base "$base_branch_name" \
-        '{"title":$title, "head":$head, "base":$base, "body":$body}') \
+      -d "$(jq -n -c --arg title "$pr_title" --arg body "$(echo -e "$pr_body")" --arg head "$follower_branch_name" --arg base "$base_branch_name" '{"title":$title, "head":$head, "base":$base, "body":$body}')" \
       "https://api.github.com/repos/$follower_repo_name/pulls"
   fi
 else
