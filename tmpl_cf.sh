@@ -76,7 +76,7 @@ for file_path in $file_paths; do
     cd ..
 
     # Update the PR body with commit messages
-    pr_body="${pr_body} \n\nCommit messages for ${template_file_path}: \n${commit_messages}"
+    pr_body="${pr_body}\n\nCommit messages for ${template_file_path}:\n${commit_messages}"
 
     # Set the flag to create PR
     create_pr=1
@@ -97,10 +97,10 @@ if [ $create_pr -eq 1 ]; then
   # Create a new comment to the PR
   if [ -n "${existing_pr}" ]; then
     existing_pr_number=$(echo "${existing_pr}" | jq ".number")
-    echo $pr_body
+    echo -e $pr_body
     curl -s -X POST -H "Authorization: token ${access_token}" \
       -H "Accept: application/vnd.github+json" \
-      -d "$(jq -n -c --arg body "$pr_body" '{"body": $body}')" \
+      -d "$(jq -n -c --arg body "$(echo -e "$pr_body")" '{"body": $body}')" \
       "https://api.github.com/repos/$follower_repo_name/issues/${existing_pr_number}/comments"
   fi
 
@@ -117,7 +117,7 @@ if [ $create_pr -eq 1 ]; then
     curl -X POST -H "Authorization: token $access_token" \
       -d $(jq -n -c \
         --arg title "$pr_title" \
-        --arg body "$pr_body" \
+        --arg body "$(echo -e "$pr_body")" \
         --arg head "$follower_branch_name" \
         --arg base "$base_branch_name" \
         '{"title":$title, "head":$head, "base":$base, "body":$body}') \
