@@ -76,7 +76,7 @@ for file_path in $file_paths; do
     cd ..
 
     # Update the PR body with commit messages
-    pr_body="${pr_body}\n\nCommit messages for ${template_file_path}:\n${commit_messages}"
+    pr_body="${pr_body} \n\nCommit messages for ${template_file_path}: \n${commit_messages}"
 
     # Set the flag to create PR
     create_pr=1
