@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -eux
 
 # Add an exception for the GitHub Actions workspace
 git config --global --add safe.directory /github/workspace
